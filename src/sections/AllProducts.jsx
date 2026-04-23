@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
+import { getProducts } from '../utils/productApi';
 
 export default function AllProducts() {
   const [products, setProducts] = useState([]);
@@ -10,15 +11,22 @@ export default function AllProducts() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('/api/cart/products')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setProducts(data.products.slice(0, 8));
-        }
+    let mounted = true;
+
+    getProducts()
+      .then((allProducts) => {
+        if (!mounted) return;
+        setProducts(allProducts.slice(0, 8));
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (loading || products.length === 0) {

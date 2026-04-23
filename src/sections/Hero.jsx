@@ -61,7 +61,7 @@ export default function Hero() {
       className="relative flex min-h-screen items-center overflow-hidden pt-24 md:pt-28"
     >
       <ImageWithFallback
-        src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=1600"
+        src="https://cdn.prod.website-files.com/601195401bde1d94d961140d/62e038c9b0935e063e96049a_robert-collins-tvc5imO5pXk-unsplash.jpg"
         alt="Kids enjoying colorful ride-on toys"
         className="absolute inset-0 h-full w-full object-cover"
       />
@@ -216,7 +216,7 @@ export default function Hero() {
             <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.16),transparent_30%,rgba(255,255,255,0.04)_70%)]" />
             <div className="relative h-[320px] overflow-hidden rounded-[30px] sm:h-[420px] lg:h-[560px]">
               <ImageWithFallback
-                src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&q=80&w=1200"
+                src="https://cdn.prod.website-files.com/601195401bde1d94d961140d/62e038c9b0935e063e96049a_robert-collins-tvc5imO5pXk-unsplash.jpg"
                 alt="Kids enjoying premium toys"
                 className="h-full w-full object-cover"
               />

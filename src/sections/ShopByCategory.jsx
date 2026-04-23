@@ -6,37 +6,37 @@ import { use3DTilt } from '../hooks/use3DTilt';
 const categories = [
   {
     name: 'Ride-on Toys',
-    image: 'https://images.unsplash.com/photo-1558877385-1199c1af4e8f?auto=format&fit=crop&q=80&w=400',
+    image: 'https://www.outdoortoys.com/cdn/shop/articles/are-ride-on-toys-suitable-for-toddlers-156584.webp?v=1744117851',
     count: 32,
     color: 'card-hover-blue'
   },
   {
     name: 'Building Blocks',
-    image: 'https://images.unsplash.com/photo-1558877385-1199c1af4e8f?auto=format&fit=crop&q=80&w=400',
+    image: 'https://m.media-amazon.com/images/I/61gk71RmFnL.jpg',
     count: 28,
     color: 'card-hover-green'
   },
   {
     name: 'Dolls & Accessories',
-    image: 'https://images.unsplash.com/photo-1558877385-1199c1af4e8f?auto=format&fit=crop&q=80&w=400',
+    image: 'https://cdn.fynd.com/v2/falling-surf-7c8bb8/fyprod/wrkr/products/pictures/item/free/original/000000000494377567/TnP8lSy9GYQ-494377567-1.png',
     count: 45,
     color: 'card-hover-pink'
   },
   {
     name: 'Educational Toys',
-    image: 'https://images.unsplash.com/photo-1558877385-1199c1af4e8f?auto=format&fit=crop&q=80&w=400',
+    image: 'https://www.shumee.in/cdn/shop/files/triangle.jpg?v=1770021843&width=420',
     count: 38,
     color: 'card-hover-purple'
   },
   {
     name: 'Outdoor Play',
-    image: 'https://images.unsplash.com/photo-1558877385-1199c1af4e8f?auto=format&fit=crop&q=80&w=400',
+    image: 'https://cdn.prod.website-files.com/601195401bde1d94d961140d/62e038c9b0935e063e96049a_robert-collins-tvc5imO5pXk-unsplash.jpg',
     count: 29,
     color: 'card-hover-yellow'
   },
   {
     name: 'Board Games',
-    image: 'https://images.unsplash.com/photo-1558877385-1199c1af4e8f?auto=format&fit=crop&q=80&w=400',
+    image: 'https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_4:3/stock%2Fcustom%20stock%2F2022-11-custom-stock%2Fgames-0228-edit',
     count: 24,
     color: 'card-hover-green'
   }

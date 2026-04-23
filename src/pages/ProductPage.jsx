@@ -8,6 +8,7 @@ import { ShoppingCart, Star, Shield, Truck, RotateCcw, Heart } from 'lucide-reac
 import FeaturedProducts from '../sections/FeaturedProducts';
 import ImageWithFallback from '../components/ImageWithFallback';
 import { formatCurrencyINR } from '../utils/formatCurrency';
+import { getProducts } from '../utils/productApi';
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -17,16 +18,23 @@ export default function ProductPage() {
   const { addToCart } = useCart();
 
   useEffect(() => {
-    fetch('/api/cart/products')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const found = data.products.find(p => p.id === parseInt(id));
-          setProduct(found);
-        }
+    let mounted = true;
+
+    getProducts()
+      .then((allProducts) => {
+        if (!mounted) return;
+        const found = allProducts.find((item) => item.id === parseInt(id, 10));
+        setProduct(found);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, [id]);
 
   if (loading) return <div className="min-h-screen pt-40 flex justify-center uppercase tracking-widest font-bold text-slate-400">Loading Toy Details...</div>;

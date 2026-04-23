@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
+import { getProducts } from '../utils/productApi';
 
 export default function FeaturedProducts({ title = "Best Sellers", filter = "best_seller" }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/cart/products')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const filtered = data.products.filter(p => p[filter] === 1);
-          setProducts(filtered);
-        }
+    let mounted = true;
+
+    getProducts()
+      .then((allProducts) => {
+        if (!mounted) return;
+        const filtered = allProducts.filter((product) => product[filter] === 1);
+        setProducts(filtered);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, [filter]);
 
   if (loading) return null;

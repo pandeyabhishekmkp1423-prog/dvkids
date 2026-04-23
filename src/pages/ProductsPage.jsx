@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
 import { Search, Filter, X } from 'lucide-react';
+import { getProducts } from '../utils/productApi';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -23,22 +24,29 @@ export default function ProductsPage() {
   const ageGroups = ['All', '0-2', '3-5', '6-8', '9-12', '13+'];
 
   useEffect(() => {
-    fetch('/api/cart/products')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setProducts(data.products);
-          setFilteredProducts(data.products);
-          if (initialCategory) {
-            setActiveCategory(initialCategory);
-          }
-          if (initialAge) {
-            setActiveAge(initialAge.split(' ')[0]);
-          }
+    let mounted = true;
+
+    getProducts()
+      .then((allProducts) => {
+        if (!mounted) return;
+        setProducts(allProducts);
+        setFilteredProducts(allProducts);
+        if (initialCategory) {
+          setActiveCategory(initialCategory);
+        }
+        if (initialAge) {
+          setActiveAge(initialAge.split(' ')[0]);
         }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, [initialCategory, initialAge, initialFilter]);
 
   useEffect(() => {
