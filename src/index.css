@@ -35,6 +35,13 @@
       radial-gradient(circle at top left, rgba(255, 214, 107, 0.24), transparent 30%),
       radial-gradient(circle at top right, rgba(119, 199, 255, 0.18), transparent 28%),
       linear-gradient(180deg, #fffaf5 0%, #fffdfb 28%, #fff7ef 100%);
+    padding-bottom: 80px; /* For mobile bottom nav */
+  }
+
+  @media (min-width: 1024px) {
+    body {
+      padding-bottom: 0;
+    }
   }
 
   ::selection {
@@ -286,4 +293,22 @@
   .word-reveal {
     display: inline;
   }
+}
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+body {
+  padding-bottom: 110px; /* Prevents mobile content from hiding behind the dock */
+}
+@media (min-width: 1024px) {
+  body { padding-bottom: 0; }
 }

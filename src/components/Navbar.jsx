@@ -1,210 +1,180 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Menu, ShoppingBag, User2, X } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { 
+  ShoppingBag, 
+  User2, 
+  Heart, 
+  Search, 
+  Home, 
+  Gamepad2, 
+  Zap, 
+  Phone, 
+  LayoutGrid,
+  ChevronDown,
+  Sparkles
+} from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
-const navItems = [
-  { label: 'Home', to: '/' },
-  { label: 'Shop', to: '/products' },
-  { label: 'About', to: '/about' },
-  { label: 'Blog', to: '/blog' },
-  { label: 'Testimonials', to: '/testimonials' },
-  { label: 'Contact', to: '/contact' }
+const navLinks = [
+  { label: 'All Toys', to: '/products', icon: <Gamepad2 size={22} /> },
+  { label: 'Shop by Age', to: '/categories', icon: <LayoutGrid size={22} /> },
+  { label: 'Home', to: '/', icon: <Home size={26} />, isCenter: true },
+  { label: 'New Arrivals', to: '/new', icon: <Zap size={22} /> },
+  { label: 'Contact', to: '/contact', icon: <Phone size={22} /> },
 ];
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
-  const { cart } = useCart();
+  const { scrollY } = useScroll();
   const location = useLocation();
+  const { cart } = useCart();
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  const isHomePage = location.pathname === "/";
 
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location.pathname]);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 60);
+  });
 
-  const cartCount = useMemo(
-    () => cart.reduce((sum, item) => sum + item.quantity, 0),
-    [cart]
-  );
+  const isHighlighted = !isHomePage || isScrolled;
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5">
+      {/* --- NEXT-LEVEL DESKTOP HEADER --- */}
+      <header className="fixed inset-x-0 top-0 z-[100] hidden lg:flex justify-center transition-all duration-500 pointer-events-none">
         <motion.div
+          initial={false}
           animate={{
-            y: isScrolled ? 0 : 8,
-            scale: isScrolled ? 0.985 : 1
+            width: isScrolled ? "90%" : "100%",
+            marginTop: isScrolled ? "15px" : "0px",
+            backgroundColor: isHighlighted ? "rgba(255, 255, 255, 0.85)" : "rgba(255, 255, 255, 0)",
+            backdropFilter: isHighlighted ? "blur(24px)" : "blur(0px)",
+            borderRadius: isScrolled ? "40px" : "0px",
+            padding: isScrolled ? "8px 30px" : "20px 60px",
+            boxShadow: isScrolled ? "0 25px 50px -12px rgba(0, 0, 0, 0.15)" : "none",
+            border: isScrolled ? "1px solid rgba(255, 255, 255, 0.4)" : "1px solid rgba(255, 255, 255, 0)"
           }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className={`mx-auto max-w-7xl rounded-[30px] ${
-            isScrolled ? 'glass-effect shadow-[0_24px_60px_-34px_rgba(42,28,17,0.38)]' : 'bg-white/48 backdrop-blur-xl'
-          }`}
+          className="flex items-center justify-between pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
         >
-          <div className={`flex items-center justify-between px-4 sm:px-6 ${isScrolled ? 'h-16' : 'h-20'} transition-all duration-300`}>
-            <Link to="/" className="group flex items-center gap-3">
-              <motion.div
-                whileHover={{ rotate: -6, y: -2 }}
-                className="relative flex h-11 w-11 items-center justify-center rounded-[18px] bg-[linear-gradient(145deg,#ffb26f,#ff7b54)] text-lg font-extrabold text-white shadow-[0_16px_30px_-18px_rgba(255,123,84,0.9)]"
+          {/* 1. LEFT: 3D Pivot Branding */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <motion.div 
+              whileHover={{ rotateY: 180, scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center p-1 border border-orange-50"
+            >
+              <img src="/logo.png" alt="DV" className="w-full h-full object-contain" />
+            </motion.div>
+            <div className="flex flex-col overflow-hidden">
+              <span className={`font-black text-xl leading-none transition-colors duration-300 ${isHighlighted ? 'text-slate-900' : 'text-slate-800'}`}>
+                Kids <span className="text-orange-500">Castle</span>
+              </span>
+              <motion.span 
+                animate={{ x: isScrolled ? 0 : 0, opacity: isScrolled ? 0.6 : 1 }}
+                className="text-[9px] font-bold uppercase tracking-[0.3em] text-slate-500"
               >
-                DV
-                <span className="absolute -right-1 -top-1 h-3.5 w-3.5 rounded-full bg-kids-blue/90 ring-4 ring-white/80" />
-              </motion.div>
-              <div>
-                <div className="font-display text-lg font-extrabold leading-none text-slate-900 sm:text-xl">
-                  DV Kids Castle
-                </div>
-                <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">
-                  Ride-On Joy
-                </div>
-              </div>
+                Premium Play
+              </motion.span>
+            </div>
+          </Link>
+
+          {/* 2. MIDDLE: Floating Pill Navigation */}
+          <nav className="flex items-center p-1 bg-slate-200/20 rounded-[24px] border border-white/30 backdrop-blur-md">
+            {navLinks.map((item) => (
+              <NavLink 
+                key={item.label} 
+                to={item.to}
+                className={({ isActive }) => `
+                  relative px-6 py-2.5 text-sm font-black transition-all duration-300 rounded-[18px]
+                  ${isActive ? 'text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'}
+                `}
+              >
+                {({ isActive }) => (
+                  <>
+                    <span className="relative z-10">{item.label}</span>
+                    {isActive && (
+                      <motion.div 
+                        layoutId="nav-glow"
+                        className="absolute inset-0 bg-slate-900 rounded-[18px] shadow-lg shadow-slate-300"
+                        transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                      />
+                    )}
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* 3. RIGHT: Utility Group */}
+          <div className="flex items-center gap-2">
+            <motion.div className="flex items-center gap-1 bg-white/40 p-1 rounded-2xl border border-white/50">
+              <button className="p-2.5 hover:bg-white rounded-xl transition-all text-slate-700 active:scale-90"><Search size={20} /></button>
+              <Link to="/wishlist" className="p-2.5 hover:bg-white rounded-xl transition-all text-red-500 active:scale-90"><Heart size={20} /></Link>
+            </motion.div>
+
+            <Link to="/cart" className="relative p-3 bg-slate-900 text-white rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all">
+              <ShoppingBag size={22} />
+              <motion.span 
+                key={cart?.length}
+                initial={{ scale: 0.5 }} animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 h-5 w-5 bg-orange-500 border-2 border-white text-[10px] font-black rounded-full flex items-center justify-center"
+              >
+                {cart?.length || 0}
+              </motion.span>
             </Link>
 
-            <nav className="hidden items-center gap-8 lg:flex">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Link
-                to="/cart"
-                className="group relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/70 bg-white/72 text-slate-700 shadow-[0_16px_30px_-22px_rgba(15,23,42,0.45)] transition duration-300 hover:-translate-y-0.5 hover:text-brand-primary"
-                aria-label="Cart"
-              >
-                <ShoppingBag size={18} />
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900 px-1 text-[10px] font-bold text-white">
-                  {cartCount}
-                </span>
-              </Link>
-
-              {user ? (
-                <button
-                  onClick={logout}
-                  className="hidden items-center gap-3 rounded-2xl border border-white/70 bg-white/72 px-4 py-2 text-left shadow-[0_16px_30px_-22px_rgba(15,23,42,0.45)] transition duration-300 hover:-translate-y-0.5 sm:flex"
-                >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[linear-gradient(145deg,#fff4d8,#ffd7b3)] font-bold text-brand-primary">
-                    {(user.name || 'U').charAt(0)}
-                  </span>
-                  <span className="leading-tight">
-                    <span className="block text-sm font-bold text-slate-900">{user.name}</span>
-                    <span className="block text-[11px] text-slate-500">Sign out</span>
-                  </span>
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  className="hidden items-center gap-2 rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white shadow-[0_18px_30px_-18px_rgba(15,23,42,0.65)] transition duration-300 hover:-translate-y-0.5 hover:bg-brand-primary sm:flex"
-                >
-                  <User2 size={16} />
-                  Login
-                </Link>
-              )}
-
-              <button
-                onClick={() => setIsMenuOpen(true)}
-                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/70 bg-white/72 text-slate-800 shadow-[0_16px_30px_-22px_rgba(15,23,42,0.45)] lg:hidden"
-                aria-label="Open menu"
-              >
-                <Menu size={20} />
-              </button>
-            </div>
+            <Link to="/login" className="p-3 bg-white border border-slate-100 rounded-2xl text-orange-500 hover:shadow-lg transition-all active:scale-95">
+              <User2 size={22} />
+            </Link>
           </div>
         </motion.div>
       </header>
 
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-slate-950/35 p-3 backdrop-blur-sm lg:hidden"
-          >
-            <motion.div
-              initial={{ y: -24, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -24, opacity: 0 }}
-              transition={{ duration: 0.28 }}
-              className="glass-effect mx-auto flex min-h-[calc(100vh-24px)] max-w-xl flex-col rounded-[34px] p-5"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-display text-xl font-extrabold text-slate-900">DV Kids Castle</div>
-                  <div className="text-xs text-slate-500">Premium play, made simple</div>
-                </div>
-                <button
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-slate-800 shadow-sm"
-                  aria-label="Close menu"
-                >
-                  <X size={20} />
-                </button>
-              </div>
+      {/* --- MOBILE TOP BRANDING --- */}
+      <div className={`fixed top-0 inset-x-0 z-[100] lg:hidden flex items-center justify-between px-6 h-16 transition-all duration-500 ${
+        isHighlighted ? 'bg-white/80 backdrop-blur-lg border-b' : 'bg-transparent'
+      }`}>
+        <div className="flex items-center gap-2">
+           <img src="/logo.png" alt="Logo" className="h-9 w-9 object-contain" />
+           <span className="font-black text-slate-900">DV KIDS</span>
+        </div>
+        <div className="flex items-center gap-2">
+           <Link to="/wishlist" className="p-2 text-red-500"><Heart size={22} /></Link>
+           <Link to="/login" className="p-2 text-orange-500"><User2 size={22} /></Link>
+        </div>
+      </div>
 
-              <div className="mt-8 grid gap-3">
-                {navItems.map((item, index) => (
-                  <motion.div
-                    key={item.to}
-                    initial={{ opacity: 0, x: 16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
+      {/* --- MOBILE BOTTOM DOCK (Myntra Style with Floating Home) --- */}
+      <nav className="fixed bottom-6 inset-x-4 h-20 bg-white/90 backdrop-blur-2xl border border-white/50 shadow-2xl rounded-[35px] z-[100] flex lg:hidden items-center justify-around px-2">
+        {navLinks.map((item) => (
+          <NavLink key={item.label} to={item.to} className="relative flex flex-col items-center justify-center w-full">
+            {({ isActive }) => (
+              <>
+                {item.isCenter ? (
+                  <motion.div 
+                    whileTap={{ scale: 0.8 }}
+                    className={`-mt-12 p-5 rounded-full shadow-2xl border-4 border-white transition-colors ${isActive ? 'bg-orange-500 text-white' : 'bg-slate-900 text-white'}`}
                   >
-                    <NavLink
-                      to={item.to}
-                      className={({ isActive }) =>
-                        `flex items-center justify-between rounded-[24px] px-5 py-4 text-lg font-bold transition ${
-                          isActive ? 'bg-slate-900 text-white' : 'bg-white/70 text-slate-800'
-                        }`
-                      }
-                    >
-                      {item.label}
-                      <span className="text-sm text-slate-400">{String(index + 1).padStart(2, '0')}</span>
-                    </NavLink>
+                    {item.icon}
                   </motion.div>
-                ))}
-              </div>
-
-              <div className="mt-auto rounded-[28px] bg-[linear-gradient(135deg,rgba(255,178,111,0.25),rgba(119,199,255,0.2))] p-5">
-                <div className="text-sm font-bold text-slate-900">Your account</div>
-                <div className="mt-1 text-sm text-slate-600">
-                  {user ? `Signed in as ${user.name}` : 'Log in to manage orders and save favorites.'}
-                </div>
-                {user ? (
-                  <button
-                    onClick={logout}
-                    className="mt-4 w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-bold text-white"
-                  >
-                    Sign Out
-                  </button>
                 ) : (
-                  <Link
-                    to="/login"
-                    className="mt-4 flex w-full items-center justify-center rounded-2xl bg-slate-900 px-4 py-3 text-sm font-bold text-white"
-                  >
-                    Continue to Login
-                  </Link>
+                  <>
+                    <motion.div animate={{ y: isActive ? -4 : 0, scale: isActive ? 1.1 : 1, color: isActive ? "#f97316" : "#64748b" }}>
+                      {item.icon}
+                    </motion.div>
+                    <span className={`text-[10px] font-bold mt-1 ${isActive ? 'text-orange-500' : 'text-slate-400'}`}>
+                      {item.label}
+                    </span>
+                  </>
                 )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                {isActive && !item.isCenter && (
+                  <motion.div layoutId="mobile-dot" className="absolute -top-1 h-1 w-5 bg-orange-500 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
+                )}
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
     </>
   );
 }

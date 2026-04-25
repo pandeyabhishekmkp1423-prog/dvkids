@@ -1,282 +1,140 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Blocks, CarFront, Sparkles, Stars, Trophy } from 'lucide-react';
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
+import { Sparkles, ArrowRight, Star, PlayCircle, ShieldCheck, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import GlassCard from '../components/GlassCard';
-import { useTypingText } from '../hooks/useTypingText';
-import ImageWithFallback from '../components/ImageWithFallback';
 
-const typedWords = ['Magic Ride', 'Bright Adventure', 'Happy Memory'];
-const headlineWords = ['Let', 'Playtime', 'Take', 'Your', 'Child', 'on', 'a'];
-const floatingToys = [
-  { Icon: CarFront, className: 'left-6 top-28 md:left-12 md:top-36', color: 'bg-brand-accent/20 text-brand-primary', yRange: [0, 85] },
-  { Icon: Blocks, className: 'right-10 top-24 md:right-20 md:top-32', color: 'bg-kids-blue/20 text-kids-blue', yRange: [0, -70] },
-  { Icon: Trophy, className: 'left-[14%] bottom-28', color: 'bg-kids-pink/20 text-kids-pink', yRange: [0, 55] },
-  { Icon: Stars, className: 'right-[20%] bottom-24', color: 'bg-kids-purple/20 text-kids-purple', yRange: [0, -48] }
-];
-
-const familyPhotos = [
-  'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=300',
-  'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&q=80&w=300',
-  'https://images.unsplash.com/photo-1528460033277-8d8fd42e8f76?auto=format&fit=crop&q=80&w=300',
-  'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=300'
-];
-
-function FloatingToy({ Icon, className, color, scrollYProgress, yRange }) {
-  const motionY = useTransform(scrollYProgress, [0, 1], yRange);
-
-  return (
-    <motion.div
-      style={{ y: motionY }}
-      animate={{ rotate: [0, 10, -8, 0] }}
-      transition={{ duration: 7.5, ease: 'easeInOut', repeat: Infinity }}
-      className={`absolute hidden md:flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-[28px] border border-white/35 backdrop-blur-md ${className}`}
-    >
-      <div className={`flex h-16 w-16 items-center justify-center rounded-[22px] shadow-[0_20px_34px_-22px_rgba(15,23,42,0.38)] ${color}`}>
-        <Icon size={28} strokeWidth={1.8} />
-      </div>
-    </motion.div>
-  );
-}
-
-export default function Hero() {
+export default function PremiumLightHero() {
   const containerRef = useRef(null);
   const navigate = useNavigate();
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end start']
-  });
 
-  const typedLine = useTypingText(typedWords, 80, 1800);
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 90]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 45]);
-  const cardY = useTransform(scrollYProgress, [0, 1], [0, -36]);
-  const tiltRotate = useTransform(scrollYProgress, [0, 1], [0, 3]);
-  const horseX = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const puzzleY = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  // Mouse Tracking for subtle depth
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const handleMouseMove = (e) => {
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    mouseX.set((clientX / innerWidth) - 0.5);
+    mouseY.set((clientY / innerHeight) - 0.5);
+  };
+
+  const springX = useSpring(mouseX, { stiffness: 80, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 80, damping: 20 });
+
+  // 3D Parallax Offsets
+  const heroRotateY = useTransform(springX, [-0.5, 0.5], [5, -5]);
+  const heroRotateX = useTransform(springY, [-0.5, 0.5], [-5, 5]);
+  const kidTranslateX = useTransform(springX, [-0.5, 0.5], [-20, 20]);
 
   return (
-    <section
+    <section 
       ref={containerRef}
-      className="relative flex min-h-screen items-center overflow-hidden pt-24 md:pt-28"
+      onMouseMove={handleMouseMove}
+      className="relative min-h-screen w-full flex items-center overflow-hidden bg-[#FDFDFF] py-20"
     >
-      <ImageWithFallback
-        src="https://cdn.prod.website-files.com/601195401bde1d94d961140d/62e038c9b0935e063e96049a_robert-collins-tvc5imO5pXk-unsplash.jpg"
-        alt="Kids enjoying colorful ride-on toys"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(8,15,34,0.85),rgba(15,23,42,0.55),rgba(30,41,59,0.42))]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,214,107,0.35),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(119,199,255,0.24),transparent_30%),radial-gradient(circle_at_center,rgba(255,143,177,0.14),transparent_38%)]" />
-      <motion.div
-        style={{ y: heroY }}
-        className="hero-orb right-[-80px] top-10 h-[360px] w-[360px] bg-brand-primary/25"
-      />
-      <motion.div
-        style={{ y: cardY }}
-        className="hero-orb bottom-0 left-[-60px] h-[320px] w-[320px] bg-kids-blue/22"
-      />
-      <div className="hero-grid absolute inset-0 opacity-20" />
-      <motion.div
-        style={{ x: horseX }}
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute bottom-12 left-2 hidden items-end gap-3 md:flex"
-      >
-        <div className="rounded-full bg-white/14 px-4 py-2 text-4xl backdrop-blur-md">{'\u{1F40E}'}</div>
-        <div className="h-1 w-28 rounded-full bg-white/30" />
-      </motion.div>
-      <motion.div
-        style={{ y: puzzleY }}
-        animate={{ rotate: [0, 8, -6, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute right-[9%] top-[18%] hidden rounded-[28px] border border-white/25 bg-white/16 px-4 py-3 text-3xl backdrop-blur-md md:block"
-      >
-        {'\u{1F9E9}'}
-      </motion.div>
-      <motion.div
-        animate={{ y: [0, -8, 0], rotate: [0, 4, 0] }}
-        transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute left-[8%] top-[22%] hidden rounded-[26px] border border-white/25 bg-white/16 px-4 py-3 text-3xl backdrop-blur-md md:block"
-      >
-        {'\u{1F3A0}'}
-      </motion.div>
+      {/* --- PREMIUM LIGHT BACKGROUND --- */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[60%] bg-blue-50/50 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-5%] left-[-5%] w-[40%] h-[50%] bg-orange-50/50 blur-[100px] rounded-full" />
+        {/* Subtle Mesh Grid */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+      </div>
 
-      {floatingToys.map((toy) => (
-        <FloatingToy
-          key={toy.className}
-          Icon={toy.Icon}
-          className={toy.className}
-          color={toy.color}
-          scrollYProgress={scrollYProgress}
-          yRange={toy.yRange}
-        />
-      ))}
-
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16 lg:px-8">
-        <motion.div
-          style={{ y: contentY, rotate: tiltRotate }}
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/12 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.28em] text-white/90 backdrop-blur-md"
+      <div className="relative z-10 mx-auto w-full max-w-[1440px] px-6 lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          
+          {/* --- LEFT: TEXT CONTENT (6 Cols) --- */}
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="lg:col-span-5 space-y-8 z-30 text-center lg:text-left"
           >
-            <Sparkles size={14} className="text-brand-accent" />
-            Premium kids toys made for Indian families
-          </motion.div>
-
-          <h1 className="mt-7 max-w-4xl text-5xl font-extrabold leading-[0.92] text-white sm:text-6xl lg:text-8xl">
-            {headlineWords.map((word, index) => (
-              <span key={word} className="word-reveal mr-3">
-                <motion.span
-                  initial={{ y: '112%' }}
-                  animate={{ y: 0 }}
-                  transition={{ delay: 0.08 * index, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                  className="inline-block"
-                >
-                  {word}
-                </motion.span>
-              </span>
-            ))}
-            <span className="mt-3 block gradient-text drop-shadow-[0_10px_20px_rgba(0,0,0,0.22)]">
-              {typedLine}
-              <span className="text-white">|</span>
-            </span>
-          </h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55, duration: 0.8 }}
-            className="mt-7 max-w-2xl text-lg leading-8 text-slate-100/90 md:text-xl"
-          >
-            Ride-on cars, playful puzzle sets, and joyful outdoor toys designed to feel magical for children and dependable for parents.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.72, duration: 0.8 }}
-            className="mt-9 flex flex-col gap-4 sm:flex-row"
-          >
-            <button
-              onClick={() => navigate('/products')}
-              className="rounded-2xl bg-white px-6 py-4 text-sm font-bold text-slate-900 shadow-[0_20px_34px_-20px_rgba(255,255,255,0.6)] transition hover:-translate-y-1 hover:bg-brand-accent"
-            >
-              Explore Toys
-            </button>
-            <button
-              onClick={() => navigate('/testimonials')}
-              className="rounded-2xl border border-white/25 bg-white/8 px-6 py-4 text-sm font-bold text-white backdrop-blur-md transition hover:-translate-y-1 hover:bg-white/14"
-            >
-              Hear from Parents
-            </button>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.8 }}
-            className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center"
-          >
-            <div className="flex -space-x-4">
-              {[1, 2, 3, 4].map((i) => (
-                <ImageWithFallback
-                  key={i}
-                  src={familyPhotos[i - 1]}
-                  className="h-12 w-12 rounded-full border-4 border-white/90 object-cover shadow-lg"
-                  alt="Happy customer"
-                />
-              ))}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 border border-orange-100 shadow-sm">
+              <Sparkles size={16} className="text-orange-500" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-orange-600">Premium Indian Toy Boutique</span>
             </div>
-            <div>
-              <div className="text-sm font-bold uppercase tracking-[0.24em] text-white/60">Trusted by families</div>
-              <div className="mt-1 text-base font-semibold text-white">12,000+ joyful deliveries across India</div>
+
+            <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight">
+              Playtime Made <br />
+              <span className="text-orange-500">Extraordinary.</span>
+            </h1>
+
+            <p className="text-lg text-slate-500 max-w-md font-medium leading-relaxed mx-auto lg:mx-0">
+              Transform every afternoon into a magical adventure with our certified, safe, and futuristic ride-on collection.
+            </p>
+
+            {/* CTA SECTION (Below Text) */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 justify-center lg:justify-start">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/products')}
+                className="w-full sm:w-auto px-10 py-5 bg-slate-900 text-white font-bold rounded-2xl shadow-xl shadow-slate-200 flex items-center justify-center gap-3"
+              >
+                Explore Collection <ArrowRight size={20} />
+              </motion.button>
+              
+              <button className="flex items-center gap-3 text-slate-900 font-bold hover:text-orange-500 transition-colors">
+                <div className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center bg-white shadow-sm">
+                  <PlayCircle size={20} />
+                </div>
+                See It In Action
+              </button>
             </div>
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.94, x: 32 }}
-          animate={{ opacity: 1, scale: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-          style={{ y: cardY }}
-          className="relative"
-        >
-          <motion.div
-            whileHover={{ rotateY: 8, rotateX: -5, y: -10 }}
-            transition={{ duration: 0.45 }}
-            className="relative overflow-hidden rounded-[36px] border border-white/15 bg-white/10 p-3 shadow-[0_38px_80px_-38px_rgba(15,23,42,0.8)] backdrop-blur-xl"
-            style={{ transformStyle: 'preserve-3d', perspective: 1200 }}
+          {/* --- MIDDLE: THE KID (Floating bridge) --- */}
+          <motion.div 
+            style={{ x: kidTranslateX }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 1 }}
+            className="hidden xl:flex absolute left-[42%] top-[55%] -translate-y-1/2 z-40"
           >
-            <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.16),transparent_30%,rgba(255,255,255,0.04)_70%)]" />
-            <div className="relative h-[320px] overflow-hidden rounded-[30px] sm:h-[420px] lg:h-[560px]">
-              <ImageWithFallback
-                src="https://cdn.prod.website-files.com/601195401bde1d94d961140d/62e038c9b0935e063e96049a_robert-collins-tvc5imO5pXk-unsplash.jpg"
-                alt="Kids enjoying premium toys"
-                className="h-full w-full object-cover"
+            <div className="bg-white/80 backdrop-blur-xl border border-white p-4 rounded-[32px] shadow-2xl flex items-center gap-4">
+               <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-inner">
+                  <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=200" alt="Happy kid" className="w-full h-full object-cover" />
+               </div>
+               <div>
+                  <div className="flex text-orange-400 gap-1 mb-1"><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /><Star size={12} fill="currentColor" /></div>
+                  <p className="text-xs font-black text-slate-800">"Best gift ever!"</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Aarav's Mom, Mumbai</p>
+               </div>
+            </div>
+          </motion.div>
+
+          {/* --- RIGHT: HERO IMAGE (7 Cols) --- */}
+          <motion.div 
+            style={{ rotateX: heroRotateX, rotateY: heroRotateY, transformStyle: 'preserve-3d' }}
+            className="lg:col-span-7 relative"
+          >
+            <div className="relative aspect-[1.1/1] w-full rounded-[80px] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border-[12px] border-white group">
+              <img 
+                src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=1200" 
+                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000"
+                alt="Kid playing with toy"
               />
-
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute right-5 top-5 flex items-center gap-2 rounded-full bg-white/88 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-slate-800 shadow-lg"
-              >
-                <Stars size={14} className="text-brand-primary" />
-                Premium Play
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, -14, 0] }}
-                transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
-                className="absolute bottom-6 left-6 max-w-xs rounded-[28px] bg-white/88 p-5 shadow-[0_24px_50px_-28px_rgba(15,23,42,0.42)]"
-              >
-                <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-primary">Curated for joy</div>
-                <div className="mt-2 text-lg font-bold text-slate-900">Safe details, polished design, and toys children actually return to.</div>
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, -9, 0], x: [0, 4, 0] }}
-                transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute bottom-20 right-6 rounded-[26px] bg-slate-900/82 px-4 py-3 text-white shadow-xl backdrop-blur-md"
-              >
-                <div className="flex items-center gap-2 text-sm font-bold">
-                  <CarFront size={16} />
-                  Ride-On Favorites
-                </div>
-              </motion.div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent" />
+              
+              {/* Floating Badge on Image */}
+              <div className="absolute top-10 right-10 flex flex-col gap-3">
+                 <div className="bg-white/90 backdrop-blur-md p-4 rounded-3xl shadow-lg border border-white flex items-center gap-3">
+                    <div className="p-2 bg-green-50 rounded-xl text-green-600"><ShieldCheck size={20} /></div>
+                    <div className="text-[10px] font-black text-slate-800 uppercase tracking-widest">ISO Certified Safety</div>
+                 </div>
+                 <div className="bg-white/90 backdrop-blur-md p-4 rounded-3xl shadow-lg border border-white flex items-center gap-3">
+                    <div className="p-2 bg-pink-50 rounded-xl text-pink-500"><Heart size={20} /></div>
+                    <div className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Loved by 15k+ Parents</div>
+                 </div>
+              </div>
             </div>
+
+            {/* Decorative Background Element for Image */}
+            <div className="absolute -bottom-6 -right-6 w-full h-full border-2 border-slate-100 rounded-[80px] -z-10 translate-x-4 translate-y-4" />
           </motion.div>
 
-          <div className="mt-6 grid grid-cols-2 gap-4">
-            <GlassCard className="interactive-lift p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-primary/14 text-brand-primary">
-                  <CarFront size={20} />
-                </div>
-                <div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Best Sellers</div>
-                  <div className="mt-1 text-base font-bold text-slate-900">Ride-on stars</div>
-                </div>
-              </div>
-            </GlassCard>
-            <GlassCard className="interactive-lift p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-kids-blue/14 text-kids-blue">
-                  <Blocks size={20} />
-                </div>
-                <div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Learning Kits</div>
-                  <div className="mt-1 text-base font-bold text-slate-900">Smart play picks</div>
-                </div>
-              </div>
-            </GlassCard>
-          </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

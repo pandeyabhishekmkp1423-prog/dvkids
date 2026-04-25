@@ -1,5 +1,6 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion'; // For smooth page transitions
 import Home from '../pages/Home';
 import About from '../pages/About';
 import ProductsPage from '../pages/ProductsPage';
@@ -15,30 +16,35 @@ import BlogPost from '../pages/BlogPost';
 import Testimonials from '../pages/Testimonials';
 
 export default function AppRoutes() {
+  const location = useLocation();
+
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/products" element={<ProductsPage />} />
-      <Route path="/product/:id" element={<ProductPage />} />
-      <Route path="/programs" element={<ProductsPage />} />
-      <Route path="/admission" element={<Contact />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/checkout" element={<Checkout />} />
+    /* mode="wait" ensures the old page disappears before the new one enters */
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/product/:id" element={<ProductPage />} />
+        <Route path="/programs" element={<ProductsPage />} />
+        <Route path="/admission" element={<Contact />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
 
-      {/* Blog Routes */}
-      <Route path="/blog" element={<Blog />} />
-      <Route path="/blog/:id" element={<BlogPost />} />
-      <Route path="/testimonials" element={<Testimonials />} />
+        {/* Blog Routes */}
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<BlogPost />} />
+        <Route path="/testimonials" element={<Testimonials />} />
 
-      {/* Legal Routes */}
-      <Route path="/privacy" element={<LegalPage title="Privacy Policy" />} />
-      <Route path="/terms" element={<LegalPage title="Terms of Service" />} />
-      <Route path="/shipping" element={<LegalPage title="Shipping Policy" />} />
-      <Route path="/refund" element={<LegalPage title="Refund Policy" />} />
-    </Routes>
+        {/* Legal Routes */}
+        <Route path="/privacy" element={<LegalPage title="Privacy Policy" />} />
+        <Route path="/terms" element={<LegalPage title="Terms of Service" />} />
+        <Route path="/shipping" element={<LegalPage title="Shipping Policy" />} />
+        <Route path="/refund" element={<LegalPage title="Refund Policy" />} />
+      </Routes>
+    </AnimatePresence>
   );
 }
