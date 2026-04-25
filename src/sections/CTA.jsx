@@ -1,54 +1,124 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import Button from '../components/Button';
-import GlassCard from '../components/GlassCard';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Zap, Sparkles } from 'lucide-react';
 
-export default function CTA() {
+export default function BubbleKineticCTA() {
+  // Generate random bubbles
+  const [bubbles, setBubbles] = useState([...Array(10)].map((_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    size: Math.random() * (60 - 20) + 20,
+    delay: Math.random() * 5,
+    duration: Math.random() * (6 - 3) + 3
+  })));
+
+  const popBubble = (id) => {
+    setBubbles(prev => prev.filter(b => b.id !== id));
+    // Respawn a new bubble after popping to keep it endless
+    setTimeout(() => {
+      setBubbles(prev => [...prev, {
+        id: Date.now(),
+        left: Math.random() * 100,
+        size: Math.random() * (60 - 20) + 20,
+        delay: 0,
+        duration: Math.random() * (6 - 3) + 3
+      }]);
+    }, 1000);
+  };
+
   return (
-    <section id="admission" className="py-32 relative overflow-hidden bg-brand-primary">
-      {/* Dynamic Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.1)_100%)] -z-10" />
-      <motion.div 
-        animate={{ 
-          scale: [1, 1.2, 1],
-          opacity: [0.1, 0.2, 0.1]
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-        className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-white rounded-full blur-[100px] -z-10" 
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-         <GlassCard className="glass-effect-dark p-12 md:p-24 text-center max-w-5xl mx-auto border-white/10 relative overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)]">
+    <section className="relative py-16 lg:py-20 bg-[#050505] overflow-hidden border-y border-white/5 cursor-crosshair">
+      
+      {/* 1. INTERACTIVE BUBBLE ENGINE */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <AnimatePresence>
+          {bubbles.map((bubble) => (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1 }}
+              key={bubble.id}
+              initial={{ y: "120%", opacity: 0, x: `${bubble.left}%` }}
+              animate={{ y: "-20%", opacity: [0, 1, 1, 0] }}
+              exit={{ scale: 2, opacity: 0, filter: "blur(10px)" }}
+              transition={{ 
+                duration: bubble.duration, 
+                repeat: Infinity, 
+                delay: bubble.delay,
+                ease: "linear"
+              }}
+              className="absolute pointer-events-auto group"
+              style={{ width: bubble.size, height: bubble.size }}
             >
-               <div className="inline-flex items-center gap-2 mb-8 px-6 py-2 bg-white/10 rounded-full text-brand-accent text-xs font-bold uppercase tracking-[0.3em]">
-                  <Sparkles size={16} /> Exclusive Holiday Collections
-               </div>
-               <h2 className="text-5xl md:text-8xl font-bold text-white mb-10 font-display leading-[0.9]">
-                 Begin the <br />Adventure Today.
-               </h2>
-               <p className="text-white/70 text-xl max-w-2xl mx-auto mb-16 leading-relaxed">
-                 Discover toys that inspire, educate, and delight. Our collections are curated to bring infinite smiles to every home.
-               </p>
-               <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
-                  <a href="/programs" className="w-full sm:w-auto">
-                    <Button variant="glass" className="w-full px-16 py-6 text-xl">Shop the Collection</Button>
-                  </a>
-                  <a href="/about" className="text-white/60 font-bold uppercase tracking-[0.2em] hover:text-white transition-all flex items-center gap-3 group">
-                    Gift Guide <ArrowRight className="group-hover:translate-x-2 transition-transform" />
-                  </a>
-               </div>
+              <button
+                onClick={() => popBubble(bubble.id)}
+                className="w-full h-full rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-[2px] transition-transform active:scale-150"
+              >
+                {/* Bubble Glint */}
+                <div className="absolute top-1/4 left-1/4 w-1/4 h-1/4 bg-white/30 rounded-full blur-[1px]" />
+              </button>
             </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
 
-            {/* Subtle floating shapes inside card */}
-            <div className="absolute top-10 left-10 w-2 h-2 bg-brand-accent rounded-full animate-ping" />
-            <div className="absolute bottom-10 right-10 w-2 h-2 bg-brand-accent rounded-full animate-ping" style={{ animationDelay: '1s' }} />
-         </GlassCard>
+      {/* 2. SPEED LINES (The "Run" Effect) */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        {[...Array(4)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ x: "-100%" }}
+            animate={{ x: "200%" }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: i * 0.5 }}
+            className="absolute h-[1px] w-48 bg-orange-500"
+            style={{ top: `${25 * i}%` }}
+          />
+        ))}
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-6 relative z-10 pointer-events-none">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+          
+          {/* CONTENT BLOCK */}
+          <div className="flex-1 text-center lg:text-left space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded-full text-orange-500 text-[9px] font-black uppercase tracking-[0.4em]">
+              <Sparkles size={10} fill="currentColor" /> Pop for a Surprise
+            </div>
+            
+            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none uppercase italic">
+              Level Up <span className="text-orange-500 not-italic">Together.</span>
+            </h2>
+            
+            <p className="text-slate-500 text-xs md:text-sm max-w-sm mx-auto lg:mx-0 font-medium uppercase tracking-widest">
+              Interactive play for the digital generation.
+            </p>
+          </div>
+
+          {/* ACTION BLOCK */}
+          <div className="pointer-events-auto">
+            <motion.a 
+              href="/shop"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative group overflow-hidden px-10 py-4 bg-white rounded-2xl flex items-center gap-4 transition-all"
+            >
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Enter The Shop</span>
+                <span className="text-black font-black text-[12px] tracking-[0.1em] uppercase">Start Adventure</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:bg-orange-500 transition-colors">
+                <ArrowRight size={18} />
+              </div>
+            </motion.a>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 3. DYNAMIC PROGRESS LINE */}
+      <div className="absolute bottom-0 left-0 w-full h-[3px] bg-white/5">
+        <motion.div 
+          animate={{ x: ["-100%", "100%"] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+          className="w-1/2 h-full bg-gradient-to-r from-transparent via-orange-500 to-transparent" 
+        />
       </div>
     </section>
   );
