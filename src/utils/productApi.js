@@ -1,4 +1,4 @@
-import fallbackProducts from '../../shared/products';
+import fallbackProducts from '../data/products';
 
 export async function getProducts() {
   try {

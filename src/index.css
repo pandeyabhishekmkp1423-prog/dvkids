@@ -312,3 +312,56 @@ body {
 @media (min-width: 1024px) {
   body { padding-bottom: 0; }
 }
+/* =========================
+   🎨 KIDS UI DESIGN SYSTEM
+========================= */
+
+/* COLORS */
+:root {
+  --kid-orange: #FF8A00;
+  --kid-pink: #FF4D8D;
+  --kid-blue: #3ABEFF;
+  --kid-green: #4ADE80;
+  --kid-purple: #8B5CF6;
+  --kid-yellow: #FFD93D;
+}
+
+/* BACKGROUND */
+.kid-bg {
+  background: linear-gradient(135deg, #fff7ed, #f0f9ff);
+}
+
+/* CARD STYLE */
+.kid-card {
+  border-radius: 24px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* BUTTON */
+.kid-btn {
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(135deg, var(--kid-orange), var(--kid-pink));
+  transition: all 0.3s ease;
+}
+
+.kid-btn:hover {
+  transform: scale(1.05);
+}
+
+/* FLOATING ANIMATION */
+.kid-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+body {
+  font-family: 'Fredoka', sans-serif;
+}

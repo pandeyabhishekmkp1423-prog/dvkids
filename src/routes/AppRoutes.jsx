@@ -5,6 +5,10 @@ import Home from '../pages/Home';
 import About from '../pages/About';
 import ProductsPage from '../pages/ProductsPage';
 import ProductPage from '../pages/ProductPage';
+import CategoriesPage from '../pages/Categories';
+import NewArrivalsPage from '../pages/NewArrivals';
+import OffersPage from '../pages/Offers';
+import WishlistPage from '../pages/Wishlist';
 import Contact from '../pages/Contact';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -25,6 +29,10 @@ export default function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/products" element={<ProductsPage />} />
+        <Route path="/new" element={<NewArrivalsPage />} />
+        <Route path="/offers" element={<OffersPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/programs" element={<ProductsPage />} />
         <Route path="/admission" element={<Contact />} />

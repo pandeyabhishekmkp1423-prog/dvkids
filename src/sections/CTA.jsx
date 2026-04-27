@@ -1,123 +1,124 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Zap, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, PartyPopper } from 'lucide-react';
 
-export default function BubbleKineticCTA() {
-  // Generate random bubbles
-  const [bubbles, setBubbles] = useState([...Array(10)].map((_, i) => ({
+export default function PlayfulBubbleCTA() {
+  const bubbleColors = [
+    'from-pink-300/60 to-purple-400/40',
+    'from-yellow-200/60 to-orange-400/40',
+    'from-cyan-200/60 to-blue-400/40',
+    'from-green-200/60 to-emerald-400/40'
+  ];
+
+  // Reduced bubble count for a cleaner look in a smaller height
+  const [bubbles, setBubbles] = useState([...Array(8)].map((_, i) => ({
     id: i,
     left: Math.random() * 100,
-    size: Math.random() * (60 - 20) + 20,
+    size: Math.random() * (60 - 30) + 30, // Smaller bubbles
     delay: Math.random() * 5,
-    duration: Math.random() * (6 - 3) + 3
+    duration: Math.random() * (6 - 4) + 4,
+    color: bubbleColors[Math.floor(Math.random() * bubbleColors.length)]
   })));
 
   const popBubble = (id) => {
     setBubbles(prev => prev.filter(b => b.id !== id));
-    // Respawn a new bubble after popping to keep it endless
     setTimeout(() => {
       setBubbles(prev => [...prev, {
         id: Date.now(),
         left: Math.random() * 100,
-        size: Math.random() * (60 - 20) + 20,
+        size: Math.random() * (60 - 30) + 30,
         delay: 0,
-        duration: Math.random() * (6 - 3) + 3
+        duration: Math.random() * (6 - 4) + 4,
+        color: bubbleColors[Math.floor(Math.random() * bubbleColors.length)]
       }]);
-    }, 1000);
+    }, 400);
   };
 
   return (
-    <section className="relative py-16 lg:py-20 bg-[#050505] overflow-hidden border-y border-white/5 cursor-crosshair">
+    // Reduced Padding (py-10 lg:py-14) to minimize height
+    <section className="relative py-10 lg:py-14 bg-gradient-to-b from-blue-50 via-white to-orange-50 overflow-hidden border-y border-blue-100 cursor-default">
       
-      {/* 1. INTERACTIVE BUBBLE ENGINE */}
+      {/* Background Decor */}
+      <div className="absolute top-4 left-10 w-24 h-24 bg-white rounded-full blur-3xl opacity-60" />
+      <div className="absolute bottom-4 right-10 w-32 h-32 bg-orange-100 rounded-full blur-3xl opacity-60" />
+
+      {/* Bubble Engine */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <AnimatePresence>
           {bubbles.map((bubble) => (
             <motion.div
               key={bubble.id}
-              initial={{ y: "120%", opacity: 0, x: `${bubble.left}%` }}
-              animate={{ y: "-20%", opacity: [0, 1, 1, 0] }}
-              exit={{ scale: 2, opacity: 0, filter: "blur(10px)" }}
-              transition={{ 
-                duration: bubble.duration, 
-                repeat: Infinity, 
-                delay: bubble.delay,
-                ease: "linear"
+              initial={{ y: "110%", opacity: 0, x: `${bubble.left}%` }}
+              animate={{ 
+                y: "-10%", 
+                opacity: [0, 1, 1, 0],
+                x: [`${bubble.left}%`, `${bubble.left + 3}%`, `${bubble.left - 3}%`, `${bubble.left}%`] 
               }}
-              className="absolute pointer-events-auto group"
+              exit={{ scale: 2, opacity: 0, filter: "blur(10px)" }}
+              transition={{ duration: bubble.duration, repeat: Infinity, delay: bubble.delay, ease: "linear" }}
+              className="absolute pointer-events-auto"
               style={{ width: bubble.size, height: bubble.size }}
             >
               <button
                 onClick={() => popBubble(bubble.id)}
-                className="w-full h-full rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-[2px] transition-transform active:scale-150"
+                className={`w-full h-full rounded-full border border-white/50 bg-gradient-to-br ${bubble.color} shadow-md backdrop-blur-[1px] transition-transform active:scale-75 hover:scale-110 relative`}
               >
-                {/* Bubble Glint */}
-                <div className="absolute top-1/4 left-1/4 w-1/4 h-1/4 bg-white/30 rounded-full blur-[1px]" />
+                <div className="absolute top-[15%] left-[20%] w-1/3 h-1/4 bg-white/40 rounded-full blur-[1px] -rotate-45" />
               </button>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
 
-      {/* 2. SPEED LINES (The "Run" Effect) */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        {[...Array(4)].map((_, i) => (
-          <motion.div
-            key={i}
-            initial={{ x: "-100%" }}
-            animate={{ x: "200%" }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: i * 0.5 }}
-            className="absolute h-[1px] w-48 bg-orange-500"
-            style={{ top: `${25 * i}%` }}
-          />
-        ))}
-      </div>
-
-      <div className="max-w-[1400px] mx-auto px-6 relative z-10 pointer-events-none">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+      <div className="max-w-4xl mx-auto px-6 relative z-10 pointer-events-none text-center">
+        {/* Header Block - Compact Gaps */}
+        <div className="flex flex-col items-center gap-3">
+          <motion.div 
+            animate={{ rotate: [-1, 1, -1] }}
+            transition={{ repeat: Infinity, duration: 3 }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 bg-white shadow-sm border border-blue-100 rounded-full text-blue-500 text-[10px] font-black uppercase tracking-widest"
+          >
+            <PartyPopper size={12} /> Tap the bubbles!
+          </motion.div>
           
-          {/* CONTENT BLOCK */}
-          <div className="flex-1 text-center lg:text-left space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded-full text-orange-500 text-[9px] font-black uppercase tracking-[0.4em]">
-              <Sparkles size={10} fill="currentColor" /> Pop for a Surprise
+          <h2 className="text-4xl md:text-5xl font-black text-slate-800 leading-tight">
+            Play Time <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">Anytime.</span>
+          </h2>
+          
+          <p className="text-slate-500 text-sm max-w-xs font-semibold">
+            Sparking imagination and joy with toys that pop with personality!
+          </p>
+        </div>
+
+        {/* Action Button - Reduced margins */}
+        <div className="mt-6 pointer-events-auto">
+          <motion.a 
+            href="/products"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-flex flex-col items-center gap-2 group"
+          >
+            <div className="px-8 py-3.5 bg-orange-500 text-white rounded-full flex items-center gap-3 shadow-lg hover:bg-orange-600 transition-all">
+              <span className="font-black text-base">Start Exploring</span>
+              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                <ArrowRight size={16} />
+              </div>
             </div>
             
-            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none uppercase italic">
-              Level Up <span className="text-orange-500 not-italic">Together.</span>
-            </h2>
-            
-            <p className="text-slate-500 text-xs md:text-sm max-w-sm mx-auto lg:mx-0 font-medium uppercase tracking-widest">
-              Interactive play for the digital generation.
-            </p>
-          </div>
-
-          {/* ACTION BLOCK */}
-          <div className="pointer-events-auto">
-            <motion.a 
-              href="/shop"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative group overflow-hidden px-10 py-4 bg-white rounded-2xl flex items-center gap-4 transition-all"
-            >
-              <div className="flex flex-col items-start leading-none">
-                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Enter The Shop</span>
-                <span className="text-black font-black text-[12px] tracking-[0.1em] uppercase">Start Adventure</span>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:bg-orange-500 transition-colors">
-                <ArrowRight size={18} />
-              </div>
-            </motion.a>
-          </div>
-
+            <div className="flex items-center gap-1.5">
+              <Sparkles size={14} className="text-yellow-500" />
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Free Shipping on first order!</span>
+            </div>
+          </motion.a>
         </div>
       </div>
 
-      {/* 3. DYNAMIC PROGRESS LINE */}
-      <div className="absolute bottom-0 left-0 w-full h-[3px] bg-white/5">
+      {/* Progress Line */}
+      <div className="absolute bottom-0 left-0 w-full h-[4px] bg-slate-100">
         <motion.div 
           animate={{ x: ["-100%", "100%"] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-          className="w-1/2 h-full bg-gradient-to-r from-transparent via-orange-500 to-transparent" 
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          className="w-1/3 h-full bg-gradient-to-r from-pink-400 via-orange-400 to-blue-400" 
         />
       </div>
     </section>

@@ -2,14 +2,32 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { use3DTilt } from '../hooks/use3DTilt';
 
-const Button = ({ children, variant = 'primary', className = '', type = 'button', disabled = false, onClick, ...props }) => {
-  const { tilt, elementRef } = use3DTilt(10);
+const Button = ({
+  children,
+  variant = 'primary',
+  className = '',
+  type = 'button',
+  disabled = false,
+  onClick,
+  ...props
+}) => {
+  const { tilt, elementRef } = use3DTilt(8); // reduced tilt for smoothness
+
   const variants = {
-    primary: 'bg-brand-primary text-white shadow-[0_4px_0_rgb(204,82,43)] active:shadow-none active:translate-y-[2px] transition-all hover:bg-kids-pink glow-effect',
-    secondary: 'bg-white text-slate-800 border-2 border-slate-100 shadow-[0_4px_0_rgb(226,232,240)] active:shadow-none active:translate-y-[2px] transition-all hover:bg-kids-blue hover:text-white glow-effect',
-    outline: 'bg-transparent border-2 border-brand-primary text-brand-primary active:translate-y-[2px] transition-all hover:bg-brand-primary hover:text-white glow-effect',
-    glass: 'bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 glow-effect',
-    ghost: 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-kids-pink glow-effect'
+    primary:
+      'bg-gradient-to-r from-[#FF8A00] to-[#FF4D8D] text-white shadow-lg hover:shadow-xl',
+
+    secondary:
+      'bg-gradient-to-r from-[#3ABEFF] to-[#4ADE80] text-white shadow-md hover:shadow-lg',
+
+    outline:
+      'bg-transparent border-2 border-[#FF8A00] text-[#FF8A00] hover:bg-[#FF8A00] hover:text-white',
+
+    glass:
+      'bg-white/20 backdrop-blur-lg border border-white/30 text-white hover:bg-white/30',
+
+    ghost:
+      'bg-transparent text-slate-600 hover:bg-orange-50 hover:text-[#FF4D8D]',
   };
 
   return (
@@ -18,23 +36,28 @@ const Button = ({ children, variant = 'primary', className = '', type = 'button'
       type={type}
       disabled={disabled}
       onClick={onClick}
-      whileHover={{ y: -2, scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.05, y: -2 }}
+      whileTap={{ scale: 0.92 }}
+      transition={{ type: 'spring', stiffness: 300 }}
       style={{
         transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         transformStyle: 'preserve-3d',
-        fontFamily: 'Poppins, sans-serif'
+        fontFamily: 'Fredoka, sans-serif',
       }}
-      className={`relative inline-flex items-center justify-center px-8 py-3.5 rounded-2xl font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm uppercase tracking-wider ${variants[variant]} ${className}`}
+      className={`relative inline-flex items-center justify-center px-7 py-3 rounded-full font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm ${variants[variant]} ${className}`}
       {...props}
     >
-      <span className="relative z-10">{children}</span>
+      {/* TEXT */}
+      <span className="relative z-10 flex items-center gap-2">
+        {children}
+      </span>
 
-      {/* Subtle button glow on hover */}
+      {/* 🎨 SOFT GLOW */}
       {variant === 'primary' && (
         <motion.div
-          className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"
-          initial={false}
+          className="absolute inset-0 rounded-full bg-white/20 opacity-0"
+          whileHover={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
         />
       )}
     </motion.button>
