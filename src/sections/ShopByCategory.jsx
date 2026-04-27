@@ -30,15 +30,17 @@ export default function NexusInfinity() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // 📱 TUNED RESPONSIVE CONFIG
   const config = useMemo(() => {
     const mobile = dims.w < 640;
     const tablet = dims.w < 1024;
     return {
-      radius: mobile ? 180 : tablet ? 350 : 550,
-      cardW: mobile ? 130 : tablet ? 200 : 260,
-      perspective: mobile ? "1200px" : "2800px",
-      fontSize: mobile ? "18vw" : "22vw",
-      yOffset: mobile ? -40 : 0,
+      // Tighter radius on mobile prevents cards from flying off-screen
+      radius: mobile ? 150 : tablet ? 350 : 550, 
+      cardW: mobile ? 120 : tablet ? 200 : 260,
+      perspective: mobile ? "1000px" : "2800px",
+      fontSize: mobile ? "24vw" : "22vw", // Larger background text for impact on small screens
+      yOffset: mobile ? -20 : 0,
     };
   }, [dims.w]);
 
@@ -77,30 +79,29 @@ export default function NexusInfinity() {
 
   const onDragEnd = (_, info) => {
     setIsDragging(false);
-    if (Math.abs(info.velocity.x) > 100) info.velocity.x < 0 ? next() : prev();
-    else snapTo(Math.round(-rawRotation.get() / angle));
+    // Increased sensitivity for mobile swipes
+    const threshold = dims.w < 640 ? 50 : 100;
+    if (Math.abs(info.offset.x) > threshold) {
+      info.offset.x < 0 ? next() : prev();
+    } else {
+      snapTo(Math.round(-rawRotation.get() / angle));
+    }
   };
 
   const active = categories[activeIndex];
 
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-[#F8F9FB] text-slate-900">
+    <section className="relative w-full h-screen overflow-hidden bg-[#F8F9FB] text-slate-900 touch-none">
       
-      {/* 🌤️ BRIGHT AMBIENT BACKGROUND */}
-      <div className="absolute inset-0 z-0">
-        {/* Soft Mesh Gradients */}
-        <div className="absolute top-[-20%] right-[-10%] w-[70%] h-[70%] bg-orange-100/50 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-blue-50/60 blur-[100px] rounded-full" />
-        
-        {/* The Reflection Floor (Light Version) */}
-        <div className="absolute bottom-0 left-0 w-full h-[35vh] bg-gradient-to-t from-white to-transparent z-10" />
-        
-        {/* Subtle Canvas Texture */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-multiply pointer-events-none" />
+      {/* 🌤️ AMBIENT BACKGROUND */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[80%] h-[60%] bg-orange-100/40 blur-[100px] rounded-full" />
+        <div className="absolute bottom-[-5%] left-[-5%] w-[70%] h-[50%] bg-blue-50/50 blur-[80px] rounded-full" />
+        <div className="absolute bottom-0 left-0 w-full h-[30vh] bg-gradient-to-t from-white to-transparent z-10" />
       </div>
 
-      {/* 🏷️ HEADER (Darker Text for Contrast) */}
-      <header className="absolute top-8 sm:top-16 left-0 w-full px-6 sm:px-20 z-[60]">
+      {/* 🏷️ HEADER */}
+      <header className="absolute top-6 sm:top-16 left-0 w-full px-6 sm:px-20 z-[60]">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-2 text-orange-600 mb-1">
             <Sparkles size={12} className="fill-current" />
@@ -118,18 +119,22 @@ export default function NexusInfinity() {
       {/* 🌀 THE STAGE */}
       <main
         className="relative w-full h-full flex items-center justify-center"
-        style={{ perspective: config.perspective, transform: `translateY(${config.yOffset}px)` }}
+        style={{ 
+          perspective: config.perspective, 
+          perspectiveOrigin: "center 45%", // Tweaked for mobile viewing angle
+          transform: `translateY(${config.yOffset}px)` 
+        }}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        {/* PARALLAX BG TEXT (Soft Graphite) */}
+        {/* PARALLAX BG TEXT */}
         <motion.div style={{ x: bgParallax }} className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <AnimatePresence mode="wait">
             <motion.h2
               key={activeIndex}
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 0.04, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
+              exit={{ opacity: 0, scale: 1.1 }}
               style={{ fontSize: config.fontSize }}
               className="font-black uppercase text-slate-900 whitespace-nowrap"
             >
@@ -160,30 +165,27 @@ export default function NexusInfinity() {
               >
                 <motion.div
                   animate={{
-                    scale: isSelected ? 1.15 : 0.75,
-                    opacity: isSelected ? 1 : 0.6,
+                    scale: isSelected ? 1.1 : 0.75,
+                    opacity: isSelected ? 1 : 0.4,
                     filter: isSelected ? "blur(0px) saturate(1.1)" : "blur(2px) saturate(0.8)",
-                    translateZ: isSelected ? 100 : -100 
                   }}
-                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                   onClick={() => isSelected && navigate(`/products?category=${cat.name}`)}
-                  className={`relative rounded-[2.5rem] overflow-hidden bg-white border transition-all duration-700 ${isSelected ? 'border-orange-200 shadow-[0_40px_80px_-15px_rgba(249,115,22,0.2)]' : 'border-slate-200 shadow-lg shadow-slate-200/50'}`}
+                  className={`relative rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-white border transition-all duration-700 ${isSelected ? 'border-orange-200 shadow-2xl' : 'border-slate-200 shadow-sm'}`}
                   style={{ width: config.cardW, height: config.cardW * 1.5 }}
                 >
                   <img src={cat.image} alt="" className="w-full h-full object-cover select-none pointer-events-none" />
-                  
-                  {/* Softer Gradient Overlay for Light Theme */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-60" />
 
                   <AnimatePresence>
                     {isSelected && (
                       <motion.div
-                        initial={{ opacity: 0, y: 15 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="absolute bottom-8 left-0 w-full px-4 text-center"
+                        className="absolute bottom-6 sm:bottom-8 left-0 w-full px-4 text-center"
                       >
-                        <h3 className="text-xl sm:text-2xl font-black italic font-serif leading-none uppercase tracking-tighter text-white drop-shadow-md">
+                        <h3 className="text-lg sm:text-2xl font-black italic font-serif leading-none uppercase tracking-tighter text-white drop-shadow-md">
                           {cat.name}
                         </h3>
                       </motion.div>
@@ -196,52 +198,52 @@ export default function NexusInfinity() {
         </motion.div>
       </main>
 
-      {/* 📊 FOOTER */}
-      <footer className="absolute bottom-8 sm:bottom-16 w-full px-6 sm:px-20 z-[60] flex flex-col sm:flex-row items-center justify-between gap-8 pointer-events-none">
-        <div className="max-w-xs w-full pointer-events-auto text-center sm:text-left">
-          <motion.div key={activeIndex} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-            <p className="text-slate-500 text-[10px] uppercase tracking-[0.2em] font-bold leading-relaxed">
+      {/* 📊 FOOTER - Optimized for Mobile Stacking */}
+      <footer className="absolute bottom-6 sm:bottom-16 w-full px-6 sm:px-20 z-[60] flex flex-col items-center justify-between gap-6 sm:flex-row pointer-events-none">
+        <div className="max-w-xs w-full pointer-events-auto text-center sm:text-left order-2 sm:order-1">
+          <motion.div key={activeIndex} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 sm:space-y-4">
+            <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold leading-relaxed line-clamp-2 sm:line-clamp-none">
               {active.description || "Discover high-quality, safe, and imaginative toys for every stage of growth."}
             </p>
             <button
               onClick={() => navigate(`/products?category=${active.name}`)}
-              className="group relative w-full sm:w-auto px-10 py-4 overflow-hidden rounded-full font-black text-[9px] tracking-[0.4em] transition-all bg-slate-900 text-white hover:bg-orange-600 shadow-xl shadow-slate-200"
+              className="group relative w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 overflow-hidden rounded-full font-black text-[9px] tracking-[0.4em] transition-all bg-slate-900 text-white active:scale-95 shadow-xl"
             >
                <span className="relative flex items-center justify-center gap-2">
-                 EXPLORE COLLECTION <Zap size={14} fill="currentColor" />
+                 EXPLORE COLLECTION <Zap size={12} fill="currentColor" />
                </span>
             </button>
           </motion.div>
         </div>
 
-        {/* PROGRESS PILLS (Frosted Glass Style) */}
-        <div className="flex flex-col items-center sm:items-end gap-3 pointer-events-auto">
-          <div className="flex gap-1.5 bg-slate-200/50 backdrop-blur-xl p-2 rounded-full border border-white">
+        {/* PROGRESS PILLS */}
+        <div className="flex flex-col items-center sm:items-end gap-3 pointer-events-auto order-1 sm:order-2">
+          <div className="flex gap-1.5 bg-white/60 backdrop-blur-md p-2 rounded-full border border-white shadow-sm">
             {categories.map((_, i) => (
               <motion.button
                 key={i}
                 onClick={() => snapTo(i)}
                 animate={{
-                  width: activeIndex === i ? 30 : 6,
-                  backgroundColor: activeIndex === i ? "#ea580c" : "rgba(15, 23, 42, 0.15)"
+                  width: activeIndex === i ? 24 : 6,
+                  backgroundColor: activeIndex === i ? "#ea580c" : "rgba(15, 23, 42, 0.1)"
                 }}
                 className="h-1.5 rounded-full"
               />
             ))}
           </div>
-          <span className="text-[10px] font-black text-slate-400 tracking-[0.5em]">
+          <span className="hidden sm:block text-[10px] font-black text-slate-400 tracking-[0.5em]">
             {activeIndex + 1} / {categories.length}
           </span>
         </div>
       </footer>
 
-      {/* NAVIGATION ARROWS (Soft & Clean) */}
+      {/* NAVIGATION ARROWS - Sized down for mobile */}
       <div className="absolute inset-x-4 sm:inset-x-12 top-1/2 -translate-y-1/2 flex justify-between z-[70] pointer-events-none">
-        <button onClick={prev} className="pointer-events-auto w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center rounded-full bg-white backdrop-blur-md border border-slate-200 text-slate-900 hover:bg-orange-500 hover:text-white hover:border-orange-400 transition-all active:scale-90 shadow-lg shadow-slate-200/50">
-          <ChevronLeft size={24} />
+        <button onClick={prev} className="pointer-events-auto w-10 h-10 sm:w-16 sm:h-16 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-900 active:scale-90 shadow-lg">
+          <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
         </button>
-        <button onClick={next} className="pointer-events-auto w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center rounded-full bg-white backdrop-blur-md border border-slate-200 text-slate-900 hover:bg-orange-500 hover:text-white hover:border-orange-400 transition-all active:scale-90 shadow-lg shadow-slate-200/50">
-          <ChevronRight size={24} />
+        <button onClick={next} className="pointer-events-auto w-10 h-10 sm:w-16 sm:h-16 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-900 active:scale-90 shadow-lg">
+          <ChevronRight size={20} className="sm:w-6 sm:h-6" />
         </button>
       </div>
     </section>
